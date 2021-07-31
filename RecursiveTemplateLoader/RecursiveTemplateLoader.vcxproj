@@ -142,14 +142,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\App\App.cpp" />
-    <ClCompile Include="src\Loader\RecursiveDataLoader.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\Timer\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\App\App.h" />
-    <ClInclude Include="src\Loader\RecursiveDataLoader.h" />
+    <ClInclude Include="src\Loader\RecursiveDataLoader.hpp" />
     <ClInclude Include="src\Timer\Timer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="src\Loader\RecursiveDataLoader.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,7 +1,9 @@
 #pragma once
 
-#include "../Loader/RecursiveDataLoader.h"
+#include "../Loader/RecursiveDataLoader.hpp"
 #include "../Timer/Timer.h"
+
+#include <SFML/Audio.hpp>
 
 class App
 {
@@ -14,6 +16,9 @@ private:
 	//void testLoadAsyncLoader();
 	void testForwardLoad();
 private:
-	RecursiveDataLoader loader;
+	RecursiveDataLoader<sf::Texture> loader;
+	RecursiveDataLoader<sf::Music> loader2;
+	RecursiveDataLoader<sf::Shader> loader3;
+	//RecursiveDataLoader<sf::Music> loader2;
 };
 
