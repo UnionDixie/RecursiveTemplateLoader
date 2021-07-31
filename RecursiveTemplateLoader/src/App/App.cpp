@@ -3,39 +3,38 @@
 void App::run()
 {
 	testLoadWithLoader();
-	testForwardLoad();
 }
 
 void App::testLoadWithLoader()
 {
-	Timer timer;
 
-	//loader.loadAssets("data");//texture
-
-	loader2.loadAssets("data", [](sf::Music& a, std::string ext, std::string path) {
-		if (ext == ".wav") {
-			a.openFromFile(path); std::cout << "Ok\n";
-		}
-	});
-
-	loader3.loadAssets("data", [](sf::Shader& a, std::string ext, std::string path) {
-		if (ext == ".fs") {
-			a.loadFromFile(path,sf::Shader::Type::Fragment); 
-		}
-	});
-
-	loader3.loadAssets("data");
-	
-	sf::Music* test = loader2.getPtr("1");
-	test->play();
-
-	while (true)
 	{
-
+		RecursiveDataLoader<sf::Texture> loader;
+		loader.setSupportedFormats(".png.jpg.bmp", "[|.:,]");
+		Timer timer;
+		loader.loadAssets("data", [](auto& item, auto path) {
+			item.loadFromFile(path.string());			
+		});
+		//auto size = loader["background"]->getSize();
+	}
+	{
+		RecursiveDataLoader<sf::Music> loader;
+		loader.setSupportedFormats("wav,ogg", "[|.:,]");
+		Timer timer;
+		loader.loadAssets("data1", [](auto& item, auto path) {
+			item.openFromFile(path.string());
+		});
+		loader["meow"]->play();
+	}
+	{
+		RecursiveDataLoader<sf::Shader> loader;
+		loader.setSupportedFormats("fs|vs|gs", "[|.:,]");
+		Timer timer;
+		loader.loadAssets("data1", [](auto& item, auto path) {
+			if (path.extension().string() == ".fs")
+				item.loadFromFile(path.string(), sf::Shader::Type::Fragment);
+		});
+		loader["physics"]->setUniform("gravity", 9.8f);
 	}
 }
 
-void App::testForwardLoad()
-{
-
-}

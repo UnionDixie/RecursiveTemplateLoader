@@ -1,50 +1,49 @@
 #include "RecursiveDataLoader.hpp"
 
-#include <type_traits>
-
-template<typename T, typename F>
-constexpr auto is_valid(F&& f) -> decltype(f(std::declval<T>()), true) { return true; }
-template<typename>
-constexpr bool is_valid(...) { return false; }
-#define IS_VALID(T, EXPR) is_valid<T>( [](auto&& obj)->decltype(obj.EXPR){} )
-
-
 template<typename T>
-inline RecursiveDataLoader<T>::RecursiveDataLoader(std::string_view folderPath)
+inline void RecursiveDataLoader<T>::setSupportedFormats(std::string formats, std::string delim)
 {
-    loadAssets(folderPath);
+    std::regex regexz(delim);
+    std::vector<std::string> list(std::sregex_token_iterator(formats.begin(), formats.end(), regexz, -1),
+                                  std::sregex_token_iterator());
+    for (auto&& it : list)
+        if (!it.empty())
+            supportedFormats.emplace(std::move("." + it), true);
 }
-
-
 
 template<typename T>
 inline void RecursiveDataLoader<T>::loadAssets(std::string_view folderPath,
-            std::function<void(T&, std::string ext, std::string path)> loader) {
+            std::function<void(T& item,const std::filesystem::path& itemPath)> loader) {
+    if (loader == nullptr) {
+        std::cout << "Nullptr functor\n";
+        return;
+    }
 
     std::vector<std::filesystem::path> pathFiles;
     for (const auto& p : std::filesystem::recursive_directory_iterator(folderPath)) {
         pathFiles.emplace_back(p.path());
     }
-    std::set<std::string> supportedFormats = {
-        {".png"},{".jpg"},{".bmp"},{".wav"},{".fs"}
-    };
     for (const auto& it : pathFiles) {
         const auto& crntExtension = it.extension().string();
-        if (auto found = supportedFormats.find(crntExtension); found != supportedFormats.end()) {
+        if (supportedFormats[crntExtension]) {
             auto nameFile = it.stem().string();
-            if constexpr (IS_VALID(T, loadFromFile(""))) {
-                storage[nameFile].loadFromFile(it.string());
-            }
-            else if(loader != nullptr){
-                 loader(storage[nameFile], crntExtension, it.string());
-            }
-            else {
-                std::cout << "Class must have loadFromFile member,OR USES NON DEF LOADER";
-            }
+            auto& ref = storage[nameFile];
+            loader(ref, it);
         }
     }
 }
 
+template<typename T>
+inline T* RecursiveDataLoader<T>::operator[](std::string_view name)
+{
+    return getPtr(name);
+}
+
+template<typename T>
+inline const T* RecursiveDataLoader<T>::getPtr(const std::string_view name) const
+{
+    return getPtr(name);
+}
 
 template<typename T>
 inline T* RecursiveDataLoader<T>::getPtr(std::string_view name) {
@@ -52,14 +51,10 @@ inline T* RecursiveDataLoader<T>::getPtr(std::string_view name) {
         return &it->second;
     }
     return nullptr;
-
 }
 
-template<typename T>
-inline T& RecursiveDataLoader<T>::getRef(std::string_view name) {
-    auto found = storage.find(name.data());
-    return found->second;//hmm
-}
+
+
 
 
 
