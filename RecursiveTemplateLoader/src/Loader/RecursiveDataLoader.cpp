@@ -1,5 +1,9 @@
 #include "RecursiveDataLoader.h"
 
+#include <iostream>
+#include <set>
+#include <filesystem>
+
 RecursiveDataLoader::RecursiveDataLoader(std::string_view folderPath) noexcept
 {
     loadAssets(folderPath);
@@ -18,7 +22,7 @@ void RecursiveDataLoader::loadAssets(std::string_view folderPath)
         const auto& crntExtension = it.extension().string();
         if (auto found = supportedFormats.find(crntExtension);found != supportedFormats.end()) {
             auto nameFile = it.stem().string();
-            textureStorage[it.string()].loadFromFile(it.string());
+            textureStorage[nameFile].loadFromFile(it.string());
         }
     }
 }
