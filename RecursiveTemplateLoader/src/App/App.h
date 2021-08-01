@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Loader/RecursiveDataLoader.hpp"
+#include "../Loader/AssetsManager.h"
 #include "../Timer/Timer.h"
 
 class App
